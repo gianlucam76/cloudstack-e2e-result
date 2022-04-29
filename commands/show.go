@@ -36,7 +36,7 @@ Description:
 	if err != nil {
 		if _, ok := err.(*docopt.UserError); ok {
 			fmt.Printf(
-				"Invalid option: 'sveltosctl %s'. Use flag '--help' to read about a specific subcommand.\n",
+				"Invalid option: 'e2e_result %s'. Use flag '--help' to read about a specific subcommand.\n",
 				strings.Join(os.Args[1:], " "),
 			)
 		}
