@@ -57,7 +57,7 @@ fmt goimports: $(GOIMPORTS) ## Format and adjust import modules.
 	$(GOIMPORTS) -local golang.cisco.com/cloudstack -w .
 
 .PHONY: build
-build: fmt ## Build bin/sveltosctl
+build: fmt ## Build bin/e2e_result
 	go build -o $(BIN_DIR)/e2e_result main.go
 
 .PHONY: vet
