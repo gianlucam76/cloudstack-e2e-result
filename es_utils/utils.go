@@ -100,7 +100,7 @@ func DisplayResult(ctx context.Context, logger logr.Logger,
 
 	if testName != "" {
 		logger.Info(fmt.Sprintf("Filter by test:%s", testName))
-		generalQ.Filter(elastic.NewMatchQuery("name", testName))
+		generalQ.Filter(elastic.NewTermQuery("name.keyword", testName)) // Exact match
 	}
 
 	searchResult, err := c.Search().Index(cloudstackIndex).Query(generalQ).Size(maxResult).
