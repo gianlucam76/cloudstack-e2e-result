@@ -2,13 +2,14 @@ package show
 
 import (
 	"context"
-	"e2e_result/es_utils"
 	"fmt"
 	"strconv"
 	"strings"
 
 	docopt "github.com/docopt/docopt-go"
 	"k8s.io/klog/v2/klogr"
+
+	"github.com/gianlucam76/cs_e2e_result/es_utils"
 )
 
 // ResultHistory displays information about e2e sanity results.
@@ -24,7 +25,7 @@ Options:
      --skipped            Show e2e test results filtering by skipped tests.
      --run=<id>           Show e2e test results in a specific (vcs or ucs) run 
      --test=<name>        Show history for a specific test.
-	 --max=<int>          Maximum number of results to display (default is 100)
+     --max=<int>          Maximum number of results to display (default is 100)
 
 Description:
   The show results command shows information about e2e results.

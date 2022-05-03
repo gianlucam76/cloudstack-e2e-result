@@ -2,13 +2,14 @@ package show
 
 import (
 	"context"
-	"e2e_result/es_utils"
 	"fmt"
 	"strconv"
 	"strings"
 
 	docopt "github.com/docopt/docopt-go"
 	"k8s.io/klog/v2/klogr"
+
+	"github.com/gianlucam76/cs_e2e_result/es_utils"
 )
 
 // AvailableRuns displays information about (vcs and ucs) runs for which results were collected.
@@ -50,5 +51,5 @@ Description:
 		}
 	}
 
-	return es_utils.DisplayRuns(context.TODO(), logger, ucs, vcs, max)
+	return es_utils.DisplayRuns(context.TODO(), logger, vcs, ucs, max)
 }

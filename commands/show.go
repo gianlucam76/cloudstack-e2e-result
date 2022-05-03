@@ -8,7 +8,7 @@ import (
 
 	docopt "github.com/docopt/docopt-go"
 
-	"e2e_result/commands/show"
+	"github.com/gianlucam76/cs_e2e_result/commands/show"
 )
 
 // Show takes keyword then calls subcommand.

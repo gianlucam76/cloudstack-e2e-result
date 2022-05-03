@@ -1,10 +1,9 @@
-module e2e_result
+module github.com/gianlucam76/cs_e2e_result
 
 go 1.17
 
 require (
 	github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815
-	github.com/gdexlab/go-render v1.0.1
 	github.com/go-logr/logr v1.2.2
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/olivere/elastic/v7 v7.0.32
