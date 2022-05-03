@@ -1,4 +1,4 @@
-module github.com/gianlucam76/cs_e2e_result
+module github.com/gianlucam76/cs-e2e-result
 
 go 1.17
 
