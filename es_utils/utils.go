@@ -34,8 +34,8 @@ type result struct {
 	Run int `json:"run"`
 }
 
-// getClient returns elastic client
-func getClient() (*elastic.Client, error) {
+// GetClient returns elastic client
+func GetClient() (*elastic.Client, error) {
 	return elastic.NewClient(
 		elastic.SetSniff(false),
 		elastic.SetURL(cloudstackESURL),
@@ -43,7 +43,7 @@ func getClient() (*elastic.Client, error) {
 	)
 }
 
-func verifyIndex(ctx context.Context, c *elastic.Client) error {
+func VerifyIndex(ctx context.Context, c *elastic.Client) error {
 	exists, err := c.IndexExists(cloudstackIndex).Do(ctx)
 	if err != nil {
 		return err
@@ -56,20 +56,20 @@ func verifyIndex(ctx context.Context, c *elastic.Client) error {
 	return nil
 }
 
-func DisplayResult(ctx context.Context, logger logr.Logger,
+func GetResults(ctx context.Context, logger logr.Logger,
 	run, testName string,
 	vcs, ucs, passed, failed, skipped bool,
 	maxResult int,
-) error {
-	c, err := getClient()
+) (*elastic.SearchResult, error) {
+	c, err := GetClient()
 	if err != nil {
 		logger.Info(fmt.Sprintf("Failed to get client: %v", err))
-		return err
+		return nil, err
 	}
 
-	if err = verifyIndex(ctx, c); err != nil {
+	if err = VerifyIndex(ctx, c); err != nil {
 		logger.Info(fmt.Sprintf("Failed to verify index %v", err))
-		return err
+		return nil, err
 	}
 
 	generalQ := elastic.NewBoolQuery().Should()
@@ -108,10 +108,23 @@ func DisplayResult(ctx context.Context, logger logr.Logger,
 		Do(context.Background()) // execute
 	if err != nil {
 		logger.Info(fmt.Sprintf("Failed to run query %v", err))
-		return err
+		return nil, err
 	}
 
 	logger.Info(fmt.Sprintf("Query took %d milliseconds\n", searchResult.TookInMillis))
+
+	return searchResult, nil
+}
+
+func DisplayResult(ctx context.Context, logger logr.Logger,
+	run, testName string,
+	vcs, ucs, passed, failed, skipped bool,
+	maxResult int,
+) error {
+	searchResult, err := GetResults(ctx, logger, run, testName, vcs, ucs, passed, failed, skipped, maxResult)
+	if err != nil {
+		return err
+	}
 
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"ENVIRONMENT", "RUN", "TEST", "RESULT", "DURATION"})
@@ -134,13 +147,13 @@ func DisplayRuns(ctx context.Context, logger logr.Logger,
 	vcs, ucs bool,
 	maxResult int,
 ) error {
-	c, err := getClient()
+	c, err := GetClient()
 	if err != nil {
 		logger.Info(fmt.Sprintf("Failed to get client: %v", err))
 		return err
 	}
 
-	if err = verifyIndex(ctx, c); err != nil {
+	if err = VerifyIndex(ctx, c); err != nil {
 		logger.Info(fmt.Sprintf("Failed to verify index %v", err))
 		return err
 	}
@@ -166,9 +179,8 @@ func DisplayRuns(ctx context.Context, logger logr.Logger,
 	return nil
 }
 
-func aggregationQueryForRun(ctx context.Context, c *elastic.Client,
-	match string, maxResult int, table *tablewriter.Table,
-	logger logr.Logger) error {
+func GetAvailableRuns(ctx context.Context, c *elastic.Client,
+	match string, maxResult int, logger logr.Logger) (*elastic.AggregationBucketKeyItems, error) {
 	termAggr := elastic.NewTermsAggregation().Field("run")
 	searchResult, err := c.Search().Index(cloudstackIndex).
 		Query(elastic.NewMatchQuery("environment", match)).
@@ -176,13 +188,24 @@ func aggregationQueryForRun(ctx context.Context, c *elastic.Client,
 		Size(maxResult).Do(ctx)
 	if err != nil {
 		logger.Info(fmt.Sprintf("Failed to run query %v", err))
-		return err
+		return nil, err
 	}
 
 	b, found := searchResult.Aggregations.Terms("run")
 	if !found {
 		logger.Info("Not found")
-		return nil
+		return nil, fmt.Errorf("failed to get term aggregation results")
+	}
+
+	return b, nil
+}
+
+func aggregationQueryForRun(ctx context.Context, c *elastic.Client,
+	match string, maxResult int, table *tablewriter.Table,
+	logger logr.Logger) error {
+	b, err := GetAvailableRuns(ctx, c, match, maxResult, logger)
+	if err != nil {
+		return err
 	}
 
 	for _, bucket := range b.Buckets {
