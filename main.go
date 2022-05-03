@@ -11,7 +11,7 @@ import (
 
 	docopt "github.com/docopt/docopt-go"
 
-	"e2e_result/commands"
+	"github.com/gianlucam76/cs_e2e_result/commands"
 )
 
 func main() {
