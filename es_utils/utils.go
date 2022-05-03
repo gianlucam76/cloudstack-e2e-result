@@ -19,7 +19,7 @@ const (
 	healthCheckInterval = 10 * time.Second
 )
 
-type result struct {
+type Result struct {
 	// Name is the name of the test
 	Name string `json:"name"`
 	// DurationInMinutes is the duration of the test in minutes
@@ -131,9 +131,9 @@ func DisplayResult(ctx context.Context, logger logr.Logger,
 	table.SetAutoWrapText(false)
 	table.SetRowLine(true)
 
-	var rtyp result
+	var rtyp Result
 	for _, item := range searchResult.Each(reflect.TypeOf(rtyp)) {
-		r := item.(result)
+		r := item.(Result)
 		table.Append([]string{r.Environment, strconv.Itoa(r.Run), r.Name,
 			r.Result, fmt.Sprintf("%f", r.DurationInMinutes)})
 	}
