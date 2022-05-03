@@ -9,7 +9,7 @@ import (
 	docopt "github.com/docopt/docopt-go"
 	"k8s.io/klog/v2/klogr"
 
-	"github.com/gianlucam76/cs_e2e_result/es_utils"
+	"github.com/gianlucam76/cs-e2e-result/es_utils"
 )
 
 // AvailableRuns displays information about (vcs and ucs) runs for which results were collected.
