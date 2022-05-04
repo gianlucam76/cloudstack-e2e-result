@@ -22,6 +22,10 @@ const (
 type Result struct {
 	// Name is the name of the test
 	Name string `json:"name"`
+	// Description is the test description
+	Description string `json:"description"`
+	// Maintainer is the maintainer for a given test
+	Maintainer string `json:"maintainer"`
 	// DurationInMinutes is the duration of the test in minutes
 	DurationInMinutes float64 `json:"durationInMinutes"`
 	// Duration is the duration of the test in seconds
