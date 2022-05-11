@@ -185,17 +185,20 @@ func DisplayRuns(ctx context.Context, logger logr.Logger,
 
 func GetAvailableRuns(ctx context.Context, c *elastic.Client,
 	match string, maxResult int, logger logr.Logger) (*elastic.AggregationBucketKeyItems, error) {
-	termAggr := elastic.NewTermsAggregation().Field("run")
+	field := "run"
+	termAggr := elastic.NewTermsAggregation().Field(field).Size(maxResult).Order("_key", false)
 	searchResult, err := c.Search().Index(cloudstackIndex).
 		Query(elastic.NewMatchQuery("environment", match)).
-		Aggregation("run", termAggr).
-		Size(maxResult).Do(ctx)
+		Aggregation(field, termAggr).
+		Do(ctx)
 	if err != nil {
 		logger.Info(fmt.Sprintf("Failed to run query %v", err))
 		return nil, err
 	}
 
-	b, found := searchResult.Aggregations.Terms("run")
+	logger.Info(fmt.Sprintf("total hits: %v\n\n", searchResult.Hits.TotalHits))
+
+	b, found := searchResult.Aggregations.Terms(field)
 	if !found {
 		logger.Info("Not found")
 		return nil, fmt.Errorf("failed to get term aggregation results")
