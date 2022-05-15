@@ -36,6 +36,10 @@ type Result struct {
 	Environment string `json:"environment"`
 	// Run is the sanity run id
 	Run int `json:"run"`
+	// StartTime is the time test started
+	StartTime time.Time `json:"startTime"`
+	// Serial indicates whether test was run in serial
+	Serial bool `json:"serial"`
 }
 
 // GetClient returns elastic client
@@ -138,7 +142,11 @@ func DisplayResult(ctx context.Context, logger logr.Logger,
 	var rtyp Result
 	for _, item := range searchResult.Each(reflect.TypeOf(rtyp)) {
 		r := item.(Result)
-		table.Append([]string{r.Environment, strconv.Itoa(r.Run), r.Name,
+		name := r.Name
+		if r.Serial {
+			name = fmt.Sprintf("%s*", r.Name)
+		}
+		table.Append([]string{r.Environment, strconv.Itoa(r.Run), name,
 			r.Result, fmt.Sprintf("%f", r.DurationInMinutes)})
 	}
 
