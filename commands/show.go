@@ -17,7 +17,8 @@ func Show(ctx context.Context, args []string) error {
 	e2e_result show <command> [<args>...]
 
     results     show e2e automatic tagging test result history.
-    runs		show list of available (vcs and ucs) runs for which results were collected.
+    runs        show list of available (vcs and ucs) runs for which results were collected.
+    reports     show e2e reports.
 
 Options:
 	-h --help      Show this screen.
@@ -51,6 +52,8 @@ Description:
 		return show.ResultHistory(ctx, arguments)
 	case "runs":
 		return show.AvailableRuns(ctx, arguments)
+	case "reports":
+		return show.ReportHistory(ctx, arguments)
 	default:
 		fmt.Println(doc)
 	}
