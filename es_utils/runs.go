@@ -31,12 +31,12 @@ func DisplayRuns(ctx context.Context, logger logr.Logger,
 	table.SetRowLine(true)
 
 	if vcs || (!vcs && !ucs) {
-		if err := aggregationQueryForRun(ctx, c, "vcs", maxResult, table, logger); err != nil {
+		if err := aggregationQueryForRun(ctx, "vcs", maxResult, table, logger); err != nil {
 			return err
 		}
 	}
 	if ucs || (!vcs && !ucs) {
-		if err := aggregationQueryForRun(ctx, c, "ucs", maxResult, table, logger); err != nil {
+		if err := aggregationQueryForRun(ctx, "ucs", maxResult, table, logger); err != nil {
 			return err
 		}
 	}
@@ -46,8 +46,14 @@ func DisplayRuns(ctx context.Context, logger logr.Logger,
 	return nil
 }
 
-func GetAvailableRuns(ctx context.Context, c *elastic.Client,
+func GetAvailableRuns(ctx context.Context,
 	match string, maxResult int, logger logr.Logger) (*elastic.AggregationBucketKeyItems, error) {
+	c, err := GetClient(resultCloudstackESURL)
+	if err != nil {
+		logger.Info(fmt.Sprintf("Failed to get client: %v", err))
+		return nil, err
+	}
+
 	field := "run"
 	termAggr := elastic.NewTermsAggregation().Field(field).Size(maxResult).Order("_key", false)
 	searchResult, err := c.Search().Index(resultCloudstackIndex).
@@ -70,10 +76,10 @@ func GetAvailableRuns(ctx context.Context, c *elastic.Client,
 	return b, nil
 }
 
-func aggregationQueryForRun(ctx context.Context, c *elastic.Client,
+func aggregationQueryForRun(ctx context.Context,
 	match string, maxResult int, table *tablewriter.Table,
 	logger logr.Logger) error {
-	b, err := GetAvailableRuns(ctx, c, match, maxResult, logger)
+	b, err := GetAvailableRuns(ctx, match, maxResult, logger)
 	if err != nil {
 		return err
 	}
