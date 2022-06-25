@@ -88,6 +88,7 @@ func GetReports(ctx context.Context, logger logr.Logger,
 	}
 
 	searchResult, err := c.Search().Index(reportCloudstackIndex).Query(generalQ).Size(maxResult).
+		SortBy(elastic.NewFieldSort("run").Desc().SortMode("max")).
 		Pretty(true).            // pretty print request and response JSON
 		Do(context.Background()) // execute
 	if err != nil {
